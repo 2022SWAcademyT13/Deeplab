@@ -1,0 +1,10 @@
+#imgdict로 라벨 뽑기
+
+labels = list()
+for image in imgdict:
+    for polygon in imgdict[image]['polygons']:
+        labels.append((polygon[0]))
+
+print(len(labels))
+labels = set(labels)
+print(len(labels))
