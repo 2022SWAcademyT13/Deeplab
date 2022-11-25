@@ -8,3 +8,10 @@ for image in imgdict:
 print(len(labels))
 labels = set(labels)
 print(len(labels))
+
+#labeldict 만들기
+labels = list(labels)
+labels.sort()
+labeldict = dict()
+for i,label in enumerate(labels):
+    labeldict[label] = i
