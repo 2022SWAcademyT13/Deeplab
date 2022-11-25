@@ -1,31 +1,26 @@
-#만드는중, imgdict 있다 가정
+# 마스킹 이미지 뽑기
+# imgdict, labeldict 있다 가정
+
 import cv2 as cv
 import numpy as np
-import matplotlib.pyplot as plt
 from PIL import Image
+from tqdm import tqdm
 
-points = imgdict['MP_SEL_SUR_000001.jpg']['polygons'][0][1]
-points = points.split(';')
-points = [[float(p.split(',')[0]),float(p.split(',')[1])] for p in points]
-points = np.array(points)
-points = points - np.floor(points/points.max(axis=0)) # 좌표가 1919, 1079보다 작아야 하는데 안그래서 왜그런지 모르겠음
-points = np.round(points)
-points = points.astype(int)
+for image in tqdm(imgdict):
 
-test = np.zeros((1080, 1920,3), np.uint8)
-test = cv.fillPoly(test,[points],(255,0,0))
-
-#opencv로 이미지 보기
-cv.imshow('fillPoly',test)
-cv.waitKey(0)
-cv.destroyAllWindows()
-
-#matplot으로 보기
-plt.imshow(test)
-
-#PIL로 보기
-test = Image.fromarray(test)
-test.show()
-
-#저장
-test.save('./testimage.png', 'PNG')
+    height = int(imgdict[image]['height'])
+    width = int(imgdict[image]['width'])
+    
+    mask = np.zeros((height, width,3), np.uint8)
+    
+    for polygon in imgdict[image]['polygons']:
+        label = polygon[0]
+        points = np.array([[float(p.split(',')[0]),float(p.split(',')[1])] for p in polygon[1].split(';')])
+        points = np.round(points - np.floor(points/points.max(axis=0))).astype(int)
+        if label in labeldict:
+            mask = cv.fillPoly(mask,[points],(labeldict[label],0,0))
+        else:
+            mask = cv.fillPoly(mask,[points],(0,0,0))
+    
+    mask = Image.fromarray(mask[...,0])
+    mask.save('./Mask/' + image[:-4] + '.png', 'PNG')
