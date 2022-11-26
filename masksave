@@ -16,7 +16,7 @@ for image in tqdm(imgdict):
     for polygon in imgdict[image]['polygons']:
         label = polygon[0]
         points = np.array([[float(p.split(',')[0]),float(p.split(',')[1])] for p in polygon[1].split(';')])
-        points = np.round(points - np.floor(points/points.max(axis=0))).astype(int)
+        points = np.rint(points - np.floor(points/points.max(axis=0))).astype(int)
         if label in labeldict:
             mask = cv.fillPoly(mask,[points],(labeldict[label],0,0))
         else:
